@@ -18,7 +18,6 @@ About this presentation
 ===
 
 - Introductory level
-- Real world examples
 - http://github.com/fipar/10&#95;pt&#95;tools
 - http://github.com/fipar/percona&#95;toolkit&#95;recipes
 
@@ -110,7 +109,7 @@ Master A, replicas B and C
 
 !
 
-    pt-table-checksum --replicate percona.checksums h=A
+<span class="example">pt-table-checksum --replicate percona.checksums h=A</span>
 
 !
 
@@ -137,11 +136,11 @@ The scenario
 
 Master A, replicas B and C. 
 
-    pt-table-checksum found differences on C. 
+pt-table-checksum found differences on C. 
 
 !
 
-    pt-table-sync --replicate percona.checksums --print h=A
+<span class="example">pt-table-sync --replicate percona.checksums --print h=A</span>
 
 happy with what you see? then add --execute
 
@@ -165,7 +164,7 @@ pt-slave-delay
 
 !
 
-    pt-slave-delay --delay 2h h=slave
+<span class="example">pt-slave-delay --delay 2h h=slave</span>
 
 !
 
@@ -177,11 +176,16 @@ pt-slave-restart
 
 !
 
-    pt-slave-restart h=slave
+<span class="example">pt-slave-restart h=slave</span>
 
 !
 
 ![](./img/pt-slave-restart-flowchart.png "")
+
+!
+
+When using SBR, skipping errors can make a <span class=warning>bad
+situation worse</span>.
 
 !
 pt-heartbeat
@@ -196,7 +200,7 @@ pt-heartbeat
 On master
 ===
 
-    pt-heartbeat -D percona --create-table --update h=master
+<span class="example">pt-heartbeat -D percona --create-table --update h=master</span>
 
 
 !
@@ -204,7 +208,7 @@ On master
 From nagios/etc
 ===
 
-    pt-heartbeat -D percona --check h=replica
+<span class="example">pt-heartbeat -D percona --check h=replica</span>
 
 !
 
@@ -222,7 +226,7 @@ pt-query-digest
 
 !
 
-    pt-query-digest <path-to-log>
+<span class="example">pt-query-digest &lt;path-to-log&gt;</span>
 
 !
 
@@ -230,6 +234,33 @@ pt-query-digest
 
 !
 
+![](./img/pt-query-digest-detail-example.png "")
+
+!
+
+Filtering
+===
+
+<span class="example">pt-query-digest --filter <filter.pl> &lt;path-to-log&gt;</span>
+	
+filter.pl: 
+     
+<span class="example">return ($event->{fingerprint} =~ m/users/)</span>
+
+!
+
+Reviews
+===
+
+<span class="example">pt-query-digest --create-review-table --review D=percona,t=reviews &lt;path-to-log&gt;</span>
+
+https://github.com/box/Anemometer makes good use of this feature
+
+!
+
+![](./img/pt-query-digest-review-example.png "")
+
+!
 Operations tools
 ===
 
@@ -243,10 +274,27 @@ pt-upgrade
 
 !
 
+<span class="example">pt-upgrade h=127.0.0.1,P=5527,D=sakila,u=msandbox,p=msandbox h=127.0.0.1,P=18967,D=sakila,u=msandbox,p=msandbox queries.txt</span>
+
+!
+
+![](./img/pt-upgrade.png "")
+
+
+!
 pt-online-schema-change
 ===
 
 - Minimize impact of ALTERing tables
+- Be careful with foreign keys
+
+!
+
+<span class="example">pt-online-schema-change --alter-foreign-keys-method auto --alter "add key actor&#95;last&#95;update (last&#95;update)" --execute S=/tmp/mysql_sandbox5527.sock,D=sakila,t=actor</span>
+
+!
+
+![](./img/pt-online-schema-change.png "")
 
 !
 
@@ -263,7 +311,30 @@ pt-stalk
 
 !
 
-    pt-stalk --threshold 
+<span class=example>pt-stalk --function processlist --variable State
+--match statistics --threshold 10</span>
+
+!
+
+<span class=example>pt-stalk --function processlist --variable Command
+--match Sleep --threshold 155 --cycles 0</span>
+
+!
+
+<span class=example>pt-stalk --threshold 40 --cycles 6</span>
+
+!
+
+<span class=example>pt-stalk --function custom-check.sh --threshold 12</span>
+
+custom-check just has to provide a 'trg&#95;plugin' function, which must
+output a number
+</span>
+
+!
+
+
+<span class=example>pt-stalk --no-stalk</span>
 
 !
 
@@ -271,6 +342,18 @@ pt-sift
 ===
 
 - High level overview of pt-stalk data
+
+!
+
+
+![](./img/pt-sift.png "")
+
+!
+
+The take home message
+===
+- Don't reinvent the wheel
+- We've been burned, so you don't have to
 
 !
 
